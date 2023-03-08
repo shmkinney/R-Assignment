@@ -1,0 +1,141 @@
+---
+title: "BCB5456_R_AssignmentMD"
+author: "Shelly Kinney"
+date: "2023-03-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown for BCB 546 R Assignment 2023
+
+# Part 1.1: Data Visualization
+
+First, load up packages tidyverse and tidyr.Then read in files from online for fang_et_al_genotypes.txt and snp_positions.txt.
+
+Next is to inspect the files. First, check if the files are lists, then take a head and a tail. Then find the dimensions, the number of rows, and the number of columns. Also check the structure of the files, the names, and the classes.
+
+```{r}
+library(tidyverse)
+
+library(tidyr)
+
+snp_pos <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/snp_position.txt")
+
+fang_gen <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/fang_et_al_genotypes.txt")
+
+is.list(snp_pos)
+is.list(fang_gen)
+
+head(snp_pos)
+head(fang_gen)
+
+tail(snp_pos)
+tail(fang_gen)
+
+dim(snp_pos)
+dim(fang_gen)
+
+nrow(snp_pos)
+nrow(fang_gen)
+
+ncol(snp_pos)
+ncol(fang_gen)
+
+str(snp_pos)
+str(fang_gen)
+
+names(snp_pos)
+names(fang_gen)
+
+sapply(snp_pos, class)
+sapply(fang_gen, class)
+
+
+```
+
+For the snp_positions file, the results include:
+* is.list: is a list
+* head: shows the top 6 rows, first 5 columns and column names
+* tail: shows the last 6 rows, first 5 columns and column names
+* dim: 983  15
+* nrow: 983
+* ncol: 15
+* str: shows the attributes of each column in the list, such as whether a column contains double or character data
+* names: shows the names of each column
+* sapply(dataframe, class): shows the class of each column, such as whether a column is numeric or character
+
+For the fang_et_al_genotypes file, the results include:
+* is.list: is a list
+* head: shows the first 6 rows, first 6 columns and column names
+* tail: shows the last 6 rows, first 5 columns and column names
+* dim: 2782  986
+* nrow: 2782
+* ncol: 986
+* str: shows the attributes of each column in the list, such as whether a column contains double or character data
+* names: shows the names of each column
+* sapply(dataframe, class): shows the class of each column, such as whether a column is numeric or character
+
+
+
+# Part 1.2: Data Processing
+
+Now the two files must be processed to create 40 files, 20 of maize data and 20 of teosinte data. Each has two sets of separate chromosome files, 10 with increasing position order and ?/? for missing data and 10 with decreasing position order and -/- for missing data.
+
+First, the file fang_gen must have the column "Sample_ID" be renamed to "SNP_ID" for future merging.
+
+The maize (ZMMIL, ZMMLR, ZMMMR) and teosinte (ZMPBA, ZMPIL, ZMPJA) are to be separated out of the fang_gen file in two separate files (using column 3).
+
+Next, the maize and teosinte files are to be transposed, making sure to maintain the tab-delimited nature.
+
+For the snp_pos file, we select out the columns SNP_ID, Chromosome, and Position into a new file.
+
+Now we can join this new snp file with both the transposed maize and transposed teosinte files.
+
+Next, using the newly joined maize and teosinte files, we extricate chromosomes 1-10, so that there is one file for each chromosome for both maize and teosinte.
+
+Sort these files on the position column from smallest to largest.
+
+Next, we copy these files and change ?/? to -/- throughout the file.
+
+Finally, sort these changes files on the position column from largest to smallest.
+
+
+
+```{r}
+#rename_fang <- rename(fang_gen, SNP_ID = Sample_ID)
+
+maize_gen <- filter(fang_gen, Group == "ZMMIL"|Group == "ZMMLR"|Group == "ZMMMR")
+
+teo_gen <- filter(fang_gen, Group =="ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
+
+transpose_maize <- as.data.frame(t(maize_gen))
+#for(j in seq(ncol(maize_gen)))
+#  if(! all(maize_gen[, j] == transpose_maize[j, ])) stop("wrong transpose")
+
+head(transpose_maize)
+
+transpose_teo <- as.data.frame(t(teo_gen))
+
+head(transpose_teo)
+
+head(snp_pos)
+```
+
+All 40 files are now created.
+
+
+
+
+
+# Part 2: Data Visualization
+
+```{r}
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+# The END

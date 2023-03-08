@@ -24,7 +24,7 @@ library(tidyr)
 
 snp_pos <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/snp_position.txt")
 
-fang_gen <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/fang_et_al_genotypes.txt")
+fang_gen <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/fang_et_al_genotypes.txt", col_names=FALSE)
 
 is.list(snp_pos)
 is.list(fang_gen)
@@ -105,23 +105,27 @@ Finally, sort these changes files on the position column from largest to smalles
 
 
 ```{r}
-#rename_fang <- rename(fang_gen, SNP_ID = Sample_ID)
 
-maize_gen <- filter(fang_gen, Group == "ZMMIL"|Group == "ZMMLR"|Group == "ZMMMR")
+maize_gen <- filter(fang_gen, X3 == "ZMMIL" |X3 == "ZMMLR" | X3 == "ZMMMR"| X3 == "Group")
 
-teo_gen <- filter(fang_gen, Group =="ZMPBA" | Group == "ZMPIL" | Group == "ZMPJA")
+teo_gen <- filter(fang_gen, X3 =="ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA" | X3=="Group")
 
-transpose_maize <- as.data.frame(t(maize_gen))
-#for(j in seq(ncol(maize_gen)))
-#  if(! all(maize_gen[, j] == transpose_maize[j, ])) stop("wrong transpose")
+cut_snp <- select(snp_pos, "SNP_ID", "Chromosome", "Position")
+
+transpose_maize <- as.data.frame(t.data.frame(maize_gen))
+colnames(transpose_maize) <- transpose_maize[1,] 
+transpose_maize <- transpose_maize[-1,]
 
 head(transpose_maize)
 
-transpose_teo <- as.data.frame(t(teo_gen))
+transpose_teo <- as.data.frame(t.data.frame(teo_gen))
+colnames(transpose_teo) <- transpose_teo[1,]
+transpose_teo <- transpose_teo[-1,]
 
 head(transpose_teo)
 
-head(snp_pos)
+### current point
+
 ```
 
 All 40 files are now created.

@@ -15,8 +15,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 First, load up packages tidyverse and tidyr.Then read in files from online for fang_et_al_genotypes.txt and snp_positions.txt.
 
-Next is to inspect the files. First, check if the files are lists, then take a head and a tail. Then find the dimensions, the number of rows, and the number of columns. Also check the structure of the files, the names, and the classes.
-
 ```{r}
 library(tidyverse)
 
@@ -26,6 +24,8 @@ snp_pos <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Sprin
 
 fang_gen <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/fang_et_al_genotypes.txt", col_names=FALSE)
 ```
+
+Next is to inspect the files. First, check if the files are lists, then take a head and a tail. Then find the dimensions, the number of rows, and the number of columns. Also check the structure of the files, the names, and the classes.
 
 ```{r}
 is.list(snp_pos)
@@ -54,8 +54,6 @@ names(fang_gen)
 
 sapply(snp_pos, class)
 sapply(fang_gen, class)
-
-
 ```
 
 For the snp_positions file, the results include:
@@ -92,21 +90,17 @@ For the snp_pos file, we select out the columns SNP_ID, Chromosome, and Position
 
 Next, the maize and teosinte files are to be transposed, and the first row is set to the column names (with the original 1st row being deleted).
 
-The file fang_gen must have the column "Sample_ID" be renamed to "SNP_ID" for merging.
+The files for maize and teosinte must have the column "Sample_ID" be renamed to "SNP_ID" for merging.
 
-
-
-Now we can join this new snp file with both the transposed maize and transposed teosinte files.
+Now we can join the new snp file with both the transposed maize and transposed teosinte files.
 
 Next, using the newly joined maize and teosinte files, we extricate chromosomes 1-10, so that there is one file for each chromosome for both maize and teosinte.
 
-Sort these files on the position column from smallest to largest.
+Then sort these files on the position column from smallest to largest.
 
 Next, we copy these files and change ?/? to -/- throughout the file.
 
-Finally, sort these changes files on the position column from largest to smallest.
-
-
+Finally, sort these changed files on the position column from largest to smallest.
 
 ```{r}
 maize_gen <- filter(fang_gen, X3 == "ZMMIL" |X3 == "ZMMLR" | X3 == "ZMMMR"| X3 == "Group")
@@ -282,10 +276,22 @@ Naming scheme is as follows: i or d for increasing or decreasing, m or t for mai
 
 # Part 2: Data Visualization
 
+A: SNP Density on and across chromosomes, and SNP number in maize vs teosinte.
+
 ```{r, echo = FALSE}
 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+B: Missing data and amount of heterozygosity.
+
+```{r, echo = FALSE}
+
+```
+
+C: Similarities between groups from original dataset.
+
+```{r, echo = FALSE}
+
+```
 
 # The END

@@ -25,7 +25,9 @@ library(tidyr)
 snp_pos <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/snp_position.txt")
 
 fang_gen <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/fang_et_al_genotypes.txt", col_names=FALSE)
+```
 
+```{r}
 is.list(snp_pos)
 is.list(fang_gen)
 
@@ -84,13 +86,15 @@ For the fang_et_al_genotypes file, the results include:
 
 Now the two files must be processed to create 40 files, 20 of maize data and 20 of teosinte data. Each has two sets of separate chromosome files, 10 with increasing position order and ?/? for missing data and 10 with decreasing position order and -/- for missing data.
 
-First, the file fang_gen must have the column "Sample_ID" be renamed to "SNP_ID" for future merging.
-
-The maize (ZMMIL, ZMMLR, ZMMMR) and teosinte (ZMPBA, ZMPIL, ZMPJA) are to be separated out of the fang_gen file in two separate files (using column 3).
-
-Next, the maize and teosinte files are to be transposed, making sure to maintain the tab-delimited nature.
+First, the maize (ZMMIL, ZMMLR, ZMMMR) and teosinte (ZMPBA, ZMPIL, ZMPJA) are to be separated out of the fang_gen file in two separate files (using column 3).
 
 For the snp_pos file, we select out the columns SNP_ID, Chromosome, and Position into a new file.
+
+Next, the maize and teosinte files are to be transposed, and the first row is set to the column names (with the original 1st row being deleted).
+
+The file fang_gen must have the column "Sample_ID" be renamed to "SNP_ID" for merging.
+
+
 
 Now we can join this new snp file with both the transposed maize and transposed teosinte files.
 
@@ -105,7 +109,6 @@ Finally, sort these changes files on the position column from largest to smalles
 
 
 ```{r}
-
 maize_gen <- filter(fang_gen, X3 == "ZMMIL" |X3 == "ZMMLR" | X3 == "ZMMMR"| X3 == "Group")
 
 teo_gen <- filter(fang_gen, X3 =="ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA" | X3=="Group")
@@ -116,19 +119,162 @@ transpose_maize <- as.data.frame(t.data.frame(maize_gen))
 colnames(transpose_maize) <- transpose_maize[1,] 
 transpose_maize <- transpose_maize[-1,]
 
-head(transpose_maize)
+##head(transpose_maize)
 
 transpose_teo <- as.data.frame(t.data.frame(teo_gen))
 colnames(transpose_teo) <- transpose_teo[1,]
 transpose_teo <- transpose_teo[-1,]
 
-head(transpose_teo)
+##head(transpose_teo)
+
+new_maize <- rename(transpose_maize, SNP_ID = Sample_ID)
+
+new_teo <- rename(transpose_teo, SNP_ID = Sample_ID)
+
+fm <- inner_join(cut_snp, new_maize)
+
+ft <- inner_join(cut_snp, new_teo)
+
+#Clearing environment, keeping full files and original
+rm(maize_gen)
+rm(teo_gen)
+rm(cut_snp)
+rm(new_maize)
+rm(new_teo)
+rm(transpose_maize)
+rm(transpose_teo)
+#End of environment clearing
+
+mchr1 <- filter(fm, Chromosome == "1")
+mchr2 <- filter(fm, Chromosome == "2")
+mchr3 <- filter(fm, Chromosome == "3")
+mchr4 <- filter(fm, Chromosome == "4")
+mchr5 <- filter(fm, Chromosome == "5")
+mchr6 <- filter(fm, Chromosome == "6")
+mchr7 <- filter(fm, Chromosome == "7")
+mchr8 <- filter(fm, Chromosome == "8")
+mchr9 <- filter(fm, Chromosome == "9")
+mchr10 <- filter(fm, Chromosome == "10")
+
+tchr1 <- filter(ft, Chromosome == "1")
+tchr2 <- filter(ft, Chromosome == "2")
+tchr3 <- filter(ft, Chromosome == "3")
+tchr4 <- filter(ft, Chromosome == "4")
+tchr5 <- filter(ft, Chromosome == "5")
+tchr6 <- filter(ft, Chromosome == "6")
+tchr7 <- filter(ft, Chromosome == "7")
+tchr8 <- filter(ft, Chromosome == "8")
+tchr9 <- filter(ft, Chromosome == "9")
+tchr10 <- filter(ft, Chromosome == "10")
+
 
 ### current point
 
+#make column 3 numeric instead of character: not necessary
+#mchr1[,3] <- sapply(mchr1[,3], as.numeric)
+
+imchr1 <- arrange(mchr1, Position)
+imchr2 <- arrange(mchr2, Position)
+imchr3 <- arrange(mchr3, Position)
+imchr4 <- arrange(mchr4, Position)
+imchr5 <- arrange(mchr5, Position)
+imchr6 <- arrange(mchr6, Position)
+imchr7 <- arrange(mchr7, Position)
+imchr8 <- arrange(mchr8, Position)
+imchr9 <- arrange(mchr9, Position)
+imchr10 <- arrange(mchr10, Position)
+
+itchr1 <- arrange(tchr1, Position)
+itchr2 <- arrange(tchr2, Position)
+itchr3 <- arrange(tchr3, Position)
+itchr4 <- arrange(tchr4, Position)
+itchr5 <- arrange(tchr5, Position)
+itchr6 <- arrange(tchr6, Position)
+itchr7 <- arrange(tchr7, Position)
+itchr8 <- arrange(tchr8, Position)
+itchr9 <- arrange(tchr9, Position)
+itchr10 <- arrange(tchr10, Position)
+
+#descending with -/-
+
+dmchr1 <- arrange(mchr1, desc(Position))
+dmchr2 <- arrange(mchr2, desc(Position))
+dmchr3 <- arrange(mchr3, desc(Position))
+dmchr4 <- arrange(mchr4, desc(Position))
+dmchr5 <- arrange(mchr5, desc(Position))
+dmchr6 <- arrange(mchr6, desc(Position))
+dmchr7 <- arrange(mchr7, desc(Position))
+dmchr8 <- arrange(mchr8, desc(Position))
+dmchr9 <- arrange(mchr9, desc(Position))
+dmchr10 <- arrange(mchr10, desc(Position))
+
+dtchr1 <- arrange(tchr1, desc(Position))
+dtchr2 <- arrange(tchr2, desc(Position))
+dtchr3 <- arrange(tchr3, desc(Position))
+dtchr4 <- arrange(tchr4, desc(Position))
+dtchr5 <- arrange(tchr5, desc(Position))
+dtchr6 <- arrange(tchr6, desc(Position))
+dtchr7 <- arrange(tchr7, desc(Position))
+dtchr8 <- arrange(tchr8, desc(Position))
+dtchr9 <- arrange(tchr9, desc(Position))
+dtchr10 <- arrange(tchr10, desc(Position))
+
+dmchr1[dmchr1 == "?/?"] <- "-/-"
+dmchr2[dmchr2 == "?/?"] <- "-/-"
+dmchr3[dmchr3 == "?/?"] <- "-/-"
+dmchr4[dmchr4 == "?/?"] <- "-/-"
+dmchr5[dmchr5 == "?/?"] <- "-/-"
+dmchr6[dmchr6 == "?/?"] <- "-/-"
+dmchr7[dmchr7 == "?/?"] <- "-/-"
+dmchr8[dmchr8 == "?/?"] <- "-/-"
+dmchr9[dmchr9 == "?/?"] <- "-/-"
+dmchr10[dmchr10 == "?/?"] <- "-/-"
+
+dtchr1[dtchr1 == "?/?"] <- "-/-"
+dtchr2[dtchr2 == "?/?"] <- "-/-"
+dtchr3[dtchr3 == "?/?"] <- "-/-"
+dtchr4[dtchr4 == "?/?"] <- "-/-"
+dtchr5[dtchr5 == "?/?"] <- "-/-"
+dtchr6[dtchr6 == "?/?"] <- "-/-"
+dtchr7[dtchr7 == "?/?"] <- "-/-"
+dtchr8[dtchr8 == "?/?"] <- "-/-"
+dtchr9[dtchr9 == "?/?"] <- "-/-"
+dtchr10[dtchr10 == "?/?"] <- "-/-"
+
+#final environment cleanse
+rm(mchr1) 
+rm(mchr2) 
+rm(mchr3)
+rm(mchr4) 
+rm(mchr5) 
+rm(mchr6) 
+rm(mchr7) 
+rm(mchr8) 
+rm(mchr9) 
+rm(mchr10) 
+rm(tchr1) 
+rm(tchr2) 
+rm(tchr3) 
+rm(tchr4) 
+rm(tchr5) 
+rm(tchr6) 
+rm(tchr7)
+rm(tchr8) 
+rm(tchr9) 
+rm(tchr10)
+
+rm(fm)
+rm(ft)
+rm(fang_gen)
+rm(snp_pos)
+#end of environment cleanse
+
+
 ```
 
-All 40 files are now created.
+All 40 files are now created. 
+
+Naming scheme is as follows: i or d for increasing or decreasing, m or t for maize or teosinte, and chr# for chromosome numbers 1-10.
 
 
 
@@ -136,7 +282,7 @@ All 40 files are now created.
 
 # Part 2: Data Visualization
 
-```{r}
+```{r, echo = FALSE}
 
 ```
 

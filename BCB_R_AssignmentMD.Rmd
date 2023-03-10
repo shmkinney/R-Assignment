@@ -278,7 +278,7 @@ Naming scheme is as follows: i or d for increasing or decreasing, m or t for mai
 A: SNP Density on and across chromosomes, and SNP number in maize vs teosinte.
 
 ```{r, echo = FALSE}
-##SNP on and across chromosomes
+##SNP on and across chromosomes, pregraph work
 
 fm <- arrange(fm, Chromosome)
 ft <- arrange(ft, Chromosome)
@@ -301,15 +301,23 @@ gm <- arrange(gm, Chromosome)
 gt <- filter(ft, Position != "0")
 gt[,2] <- sapply(gt[,2], as.numeric)
 gt <- arrange(gm, Chromosome)
+```
 
+```{r, echo = FALSE}
+#Graph for maize
 gm <- gm %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
 
 ggplot(gm) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Maize") + ylab("SNP Density") 
+```
 
+```{r,echo=FALSE}
+#Graph for teosinte
 gt <- gt %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
 
 ggplot(gt) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Teosinte") + ylab("SNP Density")
+```
 
+```{r, echo = FALSE}
 ##SNP between maize and teosinte
 
 gm <- gm %>% mutate(Group = "Maize", .before=Chromosome)
@@ -319,7 +327,10 @@ gt <- gt %>% mutate(Group = "Teosinte", .before=Chromosome)
 jgmt <- full_join(gm, gt)
 
 ggplot(jgmt) + geom_bar(mapping = aes(x=Group)) + facet_wrap(~ Chromosome)
+```
 
+```{r, echo = FALSE}
+ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned, fill=Group)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome") + ylab("SNP Density")
 ```
 
 B: Missing data and amount of heterozygosity.

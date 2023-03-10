@@ -161,10 +161,7 @@ tchr8 <- filter(ft, Chromosome == "8")
 tchr9 <- filter(ft, Chromosome == "9")
 tchr10 <- filter(ft, Chromosome == "10")
 
-
-### current point
-
-#make column 3 numeric instead of character: not necessary
+#can make files numeric on position column, but not necessary
 #mchr1[,3] <- sapply(mchr1[,3], as.numeric)
 
 imchr1 <- arrange(mchr1, Position)
@@ -257,10 +254,12 @@ rm(tchr8)
 rm(tchr9) 
 rm(tchr10)
 
-rm(fm)
-rm(ft)
-rm(fang_gen)
-rm(snp_pos)
+#commented out below for graphs; remove comment status to run this code
+#rm(fang_gen)
+#rm(snp_pos)
+#rm(fm)
+#rm(ft)
+
 #end of environment cleanse
 
 
@@ -279,6 +278,47 @@ Naming scheme is as follows: i or d for increasing or decreasing, m or t for mai
 A: SNP Density on and across chromosomes, and SNP number in maize vs teosinte.
 
 ```{r, echo = FALSE}
+##SNP on and across chromosomes
+
+fm <- arrange(fm, Chromosome)
+ft <- arrange(ft, Chromosome)
+
+fm[fm == "unknown"] <- "0"
+fm[fm == "multiple"] <- "0"
+fm[fm == is.na(fm)] <- "0"
+
+ft[ft == "unknown"] <- "0"
+ft[ft == "multiple"] <- "0"
+ft[ft == is.na(ft)] <- "0"
+
+fm[,3] <- sapply(fm[,3], as.numeric)
+ft[,3] <- sapply(ft[,3], as.numeric)
+
+gm <- filter(fm, Position != "0") 
+gm[,2] <- sapply(gm[,2], as.numeric)
+gm <- arrange(gm, Chromosome)
+
+gt <- filter(ft, Position != "0")
+gt[,2] <- sapply(gt[,2], as.numeric)
+gt <- arrange(gm, Chromosome)
+
+gm <- gm %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+
+ggplot(gm) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Maize") + ylab("SNP Density") 
+
+gt <- gt %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+
+ggplot(gt) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Teosinte") + ylab("SNP Density")
+
+##SNP between maize and teosinte
+
+gm <- gm %>% mutate(Group = "Maize", .before=Chromosome)
+
+gt <- gt %>% mutate(Group = "Teosinte", .before=Chromosome)
+
+jgmt <- full_join(gm, gt)
+
+ggplot(jgmt) + geom_bar(mapping = aes(x=Group)) + facet_wrap(~ Chromosome)
 
 ```
 

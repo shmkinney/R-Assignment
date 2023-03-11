@@ -161,8 +161,6 @@ tchr8 <- filter(ft, Chromosome == "8")
 tchr9 <- filter(ft, Chromosome == "9")
 tchr10 <- filter(ft, Chromosome == "10")
 
-#can make files numeric on position column, but not necessary
-#mchr1[,3] <- sapply(mchr1[,3], as.numeric)
 
 mchr1[,3] <- sapply(mchr1[,3], as.numeric)
 mchr2[,3] <- sapply(mchr2[,3], as.numeric)
@@ -175,6 +173,16 @@ mchr8[,3] <- sapply(mchr8[,3], as.numeric)
 mchr9[,3] <- sapply(mchr9[,3], as.numeric)
 mchr10[,3] <- sapply(mchr10[,3], as.numeric)
 
+tchr1[,3] <- sapply(tchr1[,3], as.numeric)
+tchr2[,3] <- sapply(tchr2[,3], as.numeric)
+tchr3[,3] <- sapply(tchr3[,3], as.numeric)
+tchr4[,3] <- sapply(tchr4[,3], as.numeric)
+tchr5[,3] <- sapply(tchr5[,3], as.numeric)
+tchr6[,3] <- sapply(tchr6[,3], as.numeric)
+tchr7[,3] <- sapply(tchr7[,3], as.numeric)
+tchr8[,3] <- sapply(tchr8[,3], as.numeric)
+tchr9[,3] <- sapply(tchr9[,3], as.numeric)
+tchr10[,3] <- sapply(tchr10[,3], as.numeric)
 
 imchr1 <- arrange(mchr1, Position)
 imchr2 <- arrange(mchr2, Position)
@@ -243,6 +251,55 @@ dtchr7[dtchr7 == "?/?"] <- "-/-"
 dtchr8[dtchr8 == "?/?"] <- "-/-"
 dtchr9[dtchr9 == "?/?"] <- "-/-"
 dtchr10[dtchr10 == "?/?"] <- "-/-"
+
+##For creating files
+
+
+#write.table(imchr1, file="imchr1.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr2, file="imchr2.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr3, file="imchr3.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr4, file="imchr4.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr5, file="imchr5.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr6, file="imchr6.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr7, file="imchr7.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr8, file="imchr8.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr9, file="imchr9.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr10, file="imchr10.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+
+#write.table(itchr1, file="itchr1.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr2, file="itchr2.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr3, file="itchr3.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr4, file="itchr4.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr5, file="itchr5.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr6, file="itchr6.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr7, file="itchr7.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr8, file="itchr8.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr9, file="itchr9.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr10, file="itchr10.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+
+dmchr1
+dmchr2
+dmchr3
+dmchr4
+dmchr5
+dmchr6
+dmchr7
+dmchr8
+dmchr9
+dmchr10
+
+dtchr1
+dtchr2
+dtchr3
+dtchr4
+dtchr5
+dtchr6
+dtchr7
+dtchr8
+dtchr9
+dtchr10
+
+##End of file creation
 
 #final environment cleanse
 rm(mchr1) 
@@ -343,35 +400,69 @@ ggplot(jgmt) + geom_bar(mapping = aes(x=Category, fill=Category)) + facet_wrap(~
 ```
 
 ```{r, echo = FALSE}
-ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned, fill=Group)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome") + ylab("SNP Density")
+ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned, fill=Category)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome") + ylab("SNP Density")
 ```
 
 B: Missing data and amount of heterozygosity.
 
 ```{r, echo = FALSE}
 
-jgmt %>% mutate(ZDP_0752a_het = ZDP_0752a != "A/A " & ZDP_0752a != "G/G" & ZDP_0752a != "T/T" & ZDP_0752a != "C/C", .before=ZDP_0752a)
+
+mwitht <- filter(fang_gen, X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR" | X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA")
+
+maiz <- mwitht %>% filter(X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR") %>% mutate(Category = "Maize", .before=X3)
+
+maiz[1,3] <- "Category"
+
+tesi <- mwitht %>% filter(X3 == "Group" |X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA") %>% mutate(Category = "Teosinte", .before=X3)
+ 
+tesi[1,3] <- "Category"
+
+maiz %>% count(Category)
+
+tesi %>% count(Category)
+
+rejoined <- full_join(tesi, maiz)
+
+rejoined %>% count(Category)
+
+colnames(rejoined) <- rejoined[1,] 
+rejoined <- rejoined[-1,]
+rejoined
+
+tempo <- function(x) for(i in col(x)){if(i == "A/A"){"0"}else if (i == "G/G"){"0"}else if(i == "C/C"){"0"}else if(i == "T/T"){"0"}else if(i == "?/?"){NA}else{"1"}}
+
+hetz <- function(x) if(x %in% c("A/A","G/G","C/C","T/T")){"0"} else if(x == "?/?"){NA} else{"1"}
+
+rejoined %>% select(!"Sample_ID" & !"JG_OTU" & !"Category" & !"Group") %>% lapply(hetz)
+
+hetz("A/T")
+
+head(rejoined)
+
+####
+#jgmt %>% mutate(ZDP_0752a_het = ZDP_0752a != "A/A " & ZDP_0752a != "G/G" & ZDP_0752a != "T/T" & ZDP_0752a != "C/C", .before=ZDP_0752a)
 ##Above code works
 ##Now to get it to be automated for all columns........
 
-hz <- function(x) mutate(het_x = x != "A/A " & x != "G/G" & x != "T/T" & x != "C/C")
+#hz <- function(x) mutate(het_x = x != "A/A " & x != "G/G" & x != "T/T" & x != "C/C")
 
 #hetz <- function(x) if(x != "A/A" & x != "G/G" & x != "T/T" & x != "C/C"){TRUE}
 
-temporary <- jgmt %>% select(!SNP_ID & !Chromosome & !Group & !Position)
+#temporary <- jgmt %>% select(!SNP_ID & !Chromosome & !Group & !Position)
 
-additional <- jgmt %>% select(SNP_ID, Chromosome, Group, Position)
+#additional <- jgmt %>% select(SNP_ID, Chromosome, Group, Position)
 
-temporary %>% cols %>% hz
+#temporary %>% cols %>% hz
 
-jgmt %>% mutate(het_x = x != "A/A " & x != "G/G" & x != "T/T" & x != "C/C")
+#jgmt %>% mutate(het_x = x != "A/A " & x != "G/G" & x != "T/T" & x != "C/C")
 
 ##new idea
 #make function for going through columns
 
-column <- function(x) select(x, col)
+#column <- function(x) select(x, col)
 
-jgmt %>% mutate(het = column != "A/A " & column != "G/G" & column != "T/T" & column != "C/C")
+#jgmt %>% mutate(het = column != "A/A " & column != "G/G" & column != "T/T" & column != "C/C")
 
 ## :(  why wont anything work sigh, its 12:30 AM
 
@@ -385,7 +476,7 @@ jgmt %>% mutate(het = column != "A/A " & column != "G/G" & column != "T/T" & col
 
 #temporary %>% mutate(across(.cols = everything(), .fns=NULL, .names = "het_{.col}"))
 
-ggplot(jgmt) + geom_point(mapping = aes(x=Group, y=SNP_ID))
+#ggplot(jgmt) + geom_point(mapping = aes(x=Group, y=SNP_ID))
 
 ```
 
@@ -396,13 +487,11 @@ Used "Estimated Physical Map Position Based on Genetic Markers" column for centr
 
 
 ```{r, echo = FALSE}
-library(data.table)
+#library(data.table)
 
-unite_fang <- fang_gen %>% unite(X1, X1, X3, sep="_")
+#unite_fang <- fang_gen %>% unite(X1, X1, X3, sep="_")
 
-
-
-filter(unite_fang, X1 %like% "Sample_ID_Group" | X1 %like% 'ZMMIL' | X1 %like% 'ZMMLR' | X1 %like% 'ZMMMR' | X1 %like% 'ZMPBA' | X1 %like% 'ZMPIL' | X1 %like% 'ZMPJA')
+#filter(unite_fang, X1 %like% "Sample_ID_Group" | X1 %like% 'ZMMIL' | X1 %like% 'ZMMLR' | X1 %like% 'ZMMMR' | X1 %like% 'ZMPBA' | X1 %like% 'ZMPIL' | X1 %like% 'ZMPJA')
 
 ## 
 cmchr1 <- imchr1 %>% mutate(Centromere = Position >= 121000000 & Position <= 133100000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
@@ -416,10 +505,47 @@ cmchr8 <- imchr8 %>% mutate(Centromere = Position >= 55800000 & Position <= 8070
 cmchr9 <- imchr9 %>% mutate(Centromere = Position >= 34100000 & Position <= 34200000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
 cmchr10 <- imchr10 %>% mutate(Centromere = Position >= 37100000 & Position <= 46000000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
 
-ggplot(cmchr10) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere))
-
 ```
 
+```{r, echo=FALSE}
+ggplot(cmchr1) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr2) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr3) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr4) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr5) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr6) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr7) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr8) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr9) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr10) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome") + ylab("SNP Density")
+```
 
 ```{r, echo = FALSE}
 
@@ -444,10 +570,15 @@ rejoined %>% count(Category)
 colnames(rejoined) <- rejoined[1,] 
 rejoined <- rejoined[-1,]
 
-ggplot(rejoined) + geom_bar(mapping = aes(x=Category, fill=Group))
+ggplot(rejoined) + geom_bar(mapping = aes(x=Category, fill=Group)) + xlab("Category") + ylab("Count of Samples")
 
 ```
-
+```{r, echo=FALSE}
+ggplot(rejoined) + geom_bar(mapping = aes(x = abph1.20, fill = Category)) + xlab("SNP abph1.20 Variations") + ylab("Frequency")
+```
+```{r, echo=FALSE}
+ggplot(rejoined) + geom_bar(mapping = aes(x=abph1.20, fill=Group)) + xlab("SNP abph1.20 Variations") + ylab("Frequency")
+```
 
 
 # The END

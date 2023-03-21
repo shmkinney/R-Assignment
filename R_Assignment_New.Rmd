@@ -412,17 +412,6 @@ ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned)) + xlab("Area of Chromo
 B: Missing data and amount of heterozygosity.
 
 ```{r, echo = FALSE}
-
-
-
-#Potentially useful code??
-#library(data.table)
-
-#unite_fang <- fang_gen %>% unite(X1, X1, X3, sep="_")
-
-#filter(unite_fang, X1 %like% "Sample_ID_Group" | X1 %like% 'ZMMIL' | X1 %like% 'ZMMLR' | X1 %like% 'ZMMMR' | X1 %like% 'ZMPBA' | X1 %like% 'ZMPIL' | X1 %like% 'ZMPJA')
-
-##Copy of below code from part 3 Sample Size Graph
 mwitht <- filter(fang_gen, X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR" | X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA")
 
 maiz <- mwitht %>% filter(X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR") %>% mutate(Category = "Maize", .before=X3)
@@ -437,9 +426,6 @@ rejoined <- full_join(tesi, maiz)
 
 colnames(rejoined) <- rejoined[1,] 
 rejoined <- rejoined[-1,]
-rejoined
-
-##End of copy
 
 Homozygous <- rowSums(rejoined == "A/A" | rejoined == "C/C" | rejoined == "G/G" | rejoined == "T/T")
 Heterozygous <- rowSums(rejoined == "C/G" | rejoined == "A/C" | rejoined == "G/T" | rejoined == "A/G"| rejoined == "C/T" | rejoined == "A/T")
@@ -451,57 +437,28 @@ Sample_ID <- select(rejoined, "Sample_ID")
 HetFull <- data.frame(Sample_ID, Group, Category, Homozygous, Heterozygous, MissingData)
 head(HetFull)
 
-##Attempts to get functions to work
+ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Homozygous)) + xlab("Sample") + ylab("Number of Homozygous SNPs")
 
-#tempo <- function(x) for(i in col(x)){if(i == "A/A"){"0"}else if (i == "G/G"){"0"}else if(i == "C/C"){"0"}else if(i == "T/T"){"0"}else if(i == "?/?"){NA}else{"1"}}
-
-#hetz <- function(x) if(x %in% c("A/A","G/G","C/C","T/T")){"0"} else if(x == "?/?"){NA} else{"1"}
-
-#rejoined %>% select(!"Sample_ID" & !"JG_OTU" & !"Category" & !"Group") %>% lapply(hetz)
-
-#Function test that works?
-#hetz("A/T")
-
-#head(rejoined)
-
-####
-#jgmt %>% mutate(ZDP_0752a_het = ZDP_0752a != "A/A " & ZDP_0752a != "G/G" & ZDP_0752a != "T/T" & ZDP_0752a != "C/C", .before=ZDP_0752a)
-##Above code works to separate heterozygotes/missing data and homozygotes for specific column
-##Now to get it to be automated for all columns........
-
-#hz <- function(x) mutate(het_x = x != "A/A " & x != "G/G" & x != "T/T" & x != "C/C")
-
-#hetz <- function(x) if(x != "A/A" & x != "G/G" & x != "T/T" & x != "C/C"){TRUE}
-
-#temporary <- jgmt %>% select(!SNP_ID & !Chromosome & !Group & !Position)
-
-#additional <- jgmt %>% select(SNP_ID, Chromosome, Group, Position)
-
-#temporary %>% cols %>% hz
-
-#jgmt %>% mutate(het_x = x != "A/A " & x != "G/G" & x != "T/T" & x != "C/C")
-
-##new idea
-#make function for going through columns
-
-#column <- function(x) select(x, col)
-
-#jgmt %>% mutate(het = column != "A/A " & column != "G/G" & column != "T/T" & column != "C/C")
-
-## :(  why wont anything work sigh, its 12:30 AM
-
-#jgmt %>% select(!SNP_ID & !Chromosome & !Group & !Position) %>% mutate(.col != "A/A " & {.col} != "G/G" & {.col} != "T/T" & {.col} != "C/C")
-
-#temporary %>% mutate(het_{colnames} = {colnames} != "A/A" & {colnames} != "G/G" & {colnames} != "T/T" & {colnames} != "C/C")
-
-#temporary %>% mutate(across(.cols = everything(), .fns= , .names = "het_{.col}"))
-
-#temporary %>% mutate(across(.cols = everything(), .fns=NULL, .names = "het_{.col}"))
-
-#ggplot(jgmt) + geom_point(mapping = aes(x=Group, y=SNP_ID))
-
-#End of attempts
 ```
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Homozygous, color=Group)) + xlab("Sample") + ylab("Number of Homozygous SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Homozygous, color=Category)) + xlab("Sample") + ylab("Number of Homozygous SNPs")
+```
+
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Homozygous, color=Group)) + xlab("Sample Group") + ylab("Number of Homozygous SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Homozygous, color=Category)) + xlab("Sample Group") + ylab("Number of Homozygous SNPs")
+```
+
+
+
 
 C: Maize SNPS and the Centromere.
 
@@ -567,21 +524,6 @@ ggplot(cmchr10) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + 
 ```
 
 ```{r, echo = FALSE}
-
-mwitht <- filter(fang_gen, X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR" | X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA")
-
-maiz <- mwitht %>% filter(X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR") %>% mutate(Category = "Maize", .before=X3)
-
-maiz[1,3] <- "Category"
-
-tesi <- mwitht %>% filter(X3 == "Group" |X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA") %>% mutate(Category = "Teosinte", .before=X3)
- 
-tesi[1,3] <- "Category"
-
-rejoined <- full_join(tesi, maiz)
-
-colnames(rejoined) <- rejoined[1,] 
-rejoined <- rejoined[-1,]
 
 ggplot(rejoined) + geom_bar(mapping = aes(x=Category, fill=Group)) + xlab("Category") + ylab("Count of Samples")
 

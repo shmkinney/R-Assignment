@@ -9,22 +9,577 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+## R Markdown for BCB 546 R Assignment 2023
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+# Part 1.1: Data Visualization
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+First, load up packages tidyverse and tidyr.Then read in files from online for fang_et_al_genotypes.txt and snp_positions.txt.
 
-```{r cars}
-summary(cars)
+```{r}
+library(tidyverse)
+
+library(tidyr)
+
+snp_pos <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/snp_position.txt")
+
+fang_gen <- read_tsv("https://raw.githubusercontent.com/EEOB-BioData/BCB546_Spring2023/main/assignments/UNIX_Assignment/fang_et_al_genotypes.txt", col_names=FALSE)
 ```
 
-## Including Plots
+Next is to inspect the files. First, check if the files are lists, then take a head and a tail. Then find the dimensions, the number of rows, and the number of columns. Also check the structure of the files, the names, and the classes.
 
-You can also embed plots, for example:
+```{r}
+is.list(snp_pos)
+is.list(fang_gen)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+head(snp_pos)
+head(fang_gen)
+
+tail(snp_pos)
+tail(fang_gen)
+
+dim(snp_pos)
+dim(fang_gen)
+
+nrow(snp_pos)
+nrow(fang_gen)
+
+ncol(snp_pos)
+ncol(fang_gen)
+
+str(snp_pos)
+str(fang_gen)
+
+names(snp_pos)
+names(fang_gen)
+
+sapply(snp_pos, class)
+sapply(fang_gen, class)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+For the snp_positions file, the results include:
+* is.list: is a list
+* head: shows the top 6 rows, first 5 columns and column names
+* tail: shows the last 6 rows, first 5 columns and column names
+* dim: 983  15
+* nrow: 983
+* ncol: 15
+* str: shows the attributes of each column in the list, such as whether a column contains double or character data
+* names: shows the names of each column
+* sapply(dataframe, class): shows the class of each column, such as whether a column is numeric or character
+
+For the fang_et_al_genotypes file, the results include:
+* is.list: is a list
+* head: shows the first 6 rows, first 6 columns and column names
+* tail: shows the last 6 rows, first 5 columns and column names
+* dim: 2782  986
+* nrow: 2782
+* ncol: 986
+* str: shows the attributes of each column in the list, such as whether a column contains double or character data
+* names: shows the names of each column
+* sapply(dataframe, class): shows the class of each column, such as whether a column is numeric or character
+
+
+
+# Part 1.2: Data Processing
+
+Now the two files must be processed to create 40 files, 20 of maize data and 20 of teosinte data. Each has two sets of separate chromosome files, 10 with increasing position order and ?/? for missing data and 10 with decreasing position order and -/- for missing data.
+
+First, the maize (ZMMIL, ZMMLR, ZMMMR) and teosinte (ZMPBA, ZMPIL, ZMPJA) are to be separated out of the fang_gen file in two separate files (using column 3).
+
+For the snp_pos file, we select out the columns SNP_ID, Chromosome, and Position into a new file.
+
+Next, the maize and teosinte files are to be transposed, and the first row is set to the column names (with the original 1st row being deleted).
+
+The files for maize and teosinte must have the column "Sample_ID" be renamed to "SNP_ID" for merging.
+
+Now we can join the new snp file with both the transposed maize and transposed teosinte files.
+
+Next, using the newly joined maize and teosinte files, we extricate chromosomes 1-10, so that there is one file for each chromosome for both maize and teosinte.
+
+Then sort these files on the position column from smallest to largest.
+
+Next, we copy these files and change ?/? to -/- throughout the file.
+
+Finally, sort these changed files on the position column from largest to smallest.
+
+```{r}
+maize_gen <- filter(fang_gen, X3 == "ZMMIL" |X3 == "ZMMLR" | X3 == "ZMMMR"| X3 == "Group")
+
+teo_gen <- filter(fang_gen, X3 =="ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA" | X3=="Group")
+
+cut_snp <- select(snp_pos, "SNP_ID", "Chromosome", "Position")
+
+transpose_maize <- as.data.frame(t.data.frame(maize_gen))
+colnames(transpose_maize) <- transpose_maize[1,] 
+transpose_maize <- transpose_maize[-1,]
+
+##head(transpose_maize)
+
+transpose_teo <- as.data.frame(t.data.frame(teo_gen))
+colnames(transpose_teo) <- transpose_teo[1,]
+transpose_teo <- transpose_teo[-1,]
+
+##head(transpose_teo)
+
+new_maize <- rename(transpose_maize, SNP_ID = Sample_ID)
+
+new_teo <- rename(transpose_teo, SNP_ID = Sample_ID)
+
+fm <- inner_join(cut_snp, new_maize)
+
+ft <- inner_join(cut_snp, new_teo)
+
+#Clearing environment, keeping full files and original
+rm(maize_gen)
+rm(teo_gen)
+#rm(cut_snp)
+rm(new_maize)
+rm(new_teo)
+rm(transpose_maize)
+rm(transpose_teo)
+#End of environment clearing
+
+mchr1 <- filter(fm, Chromosome == "1")
+mchr2 <- filter(fm, Chromosome == "2")
+mchr3 <- filter(fm, Chromosome == "3")
+mchr4 <- filter(fm, Chromosome == "4")
+mchr5 <- filter(fm, Chromosome == "5")
+mchr6 <- filter(fm, Chromosome == "6")
+mchr7 <- filter(fm, Chromosome == "7")
+mchr8 <- filter(fm, Chromosome == "8")
+mchr9 <- filter(fm, Chromosome == "9")
+mchr10 <- filter(fm, Chromosome == "10")
+
+tchr1 <- filter(ft, Chromosome == "1")
+tchr2 <- filter(ft, Chromosome == "2")
+tchr3 <- filter(ft, Chromosome == "3")
+tchr4 <- filter(ft, Chromosome == "4")
+tchr5 <- filter(ft, Chromosome == "5")
+tchr6 <- filter(ft, Chromosome == "6")
+tchr7 <- filter(ft, Chromosome == "7")
+tchr8 <- filter(ft, Chromosome == "8")
+tchr9 <- filter(ft, Chromosome == "9")
+tchr10 <- filter(ft, Chromosome == "10")
+
+
+mchr1[,3] <- sapply(mchr1[,3], as.numeric)
+mchr2[,3] <- sapply(mchr2[,3], as.numeric)
+mchr3[,3] <- sapply(mchr3[,3], as.numeric)
+mchr4[,3] <- sapply(mchr4[,3], as.numeric)
+mchr5[,3] <- sapply(mchr5[,3], as.numeric)
+mchr6[,3] <- sapply(mchr6[,3], as.numeric)
+mchr7[,3] <- sapply(mchr7[,3], as.numeric)
+mchr8[,3] <- sapply(mchr8[,3], as.numeric)
+mchr9[,3] <- sapply(mchr9[,3], as.numeric)
+mchr10[,3] <- sapply(mchr10[,3], as.numeric)
+
+tchr1[,3] <- sapply(tchr1[,3], as.numeric)
+tchr2[,3] <- sapply(tchr2[,3], as.numeric)
+tchr3[,3] <- sapply(tchr3[,3], as.numeric)
+tchr4[,3] <- sapply(tchr4[,3], as.numeric)
+tchr5[,3] <- sapply(tchr5[,3], as.numeric)
+tchr6[,3] <- sapply(tchr6[,3], as.numeric)
+tchr7[,3] <- sapply(tchr7[,3], as.numeric)
+tchr8[,3] <- sapply(tchr8[,3], as.numeric)
+tchr9[,3] <- sapply(tchr9[,3], as.numeric)
+tchr10[,3] <- sapply(tchr10[,3], as.numeric)
+
+imchr1 <- arrange(mchr1, Position)
+imchr2 <- arrange(mchr2, Position)
+imchr3 <- arrange(mchr3, Position)
+imchr4 <- arrange(mchr4, Position)
+imchr5 <- arrange(mchr5, Position)
+imchr6 <- arrange(mchr6, Position)
+imchr7 <- arrange(mchr7, Position)
+imchr8 <- arrange(mchr8, Position)
+imchr9 <- arrange(mchr9, Position)
+imchr10 <- arrange(mchr10, Position)
+
+itchr1 <- arrange(tchr1, Position)
+itchr2 <- arrange(tchr2, Position)
+itchr3 <- arrange(tchr3, Position)
+itchr4 <- arrange(tchr4, Position)
+itchr5 <- arrange(tchr5, Position)
+itchr6 <- arrange(tchr6, Position)
+itchr7 <- arrange(tchr7, Position)
+itchr8 <- arrange(tchr8, Position)
+itchr9 <- arrange(tchr9, Position)
+itchr10 <- arrange(tchr10, Position)
+
+#descending with -/-
+
+dmchr1 <- arrange(mchr1, desc(Position))
+dmchr2 <- arrange(mchr2, desc(Position))
+dmchr3 <- arrange(mchr3, desc(Position))
+dmchr4 <- arrange(mchr4, desc(Position))
+dmchr5 <- arrange(mchr5, desc(Position))
+dmchr6 <- arrange(mchr6, desc(Position))
+dmchr7 <- arrange(mchr7, desc(Position))
+dmchr8 <- arrange(mchr8, desc(Position))
+dmchr9 <- arrange(mchr9, desc(Position))
+dmchr10 <- arrange(mchr10, desc(Position))
+
+dtchr1 <- arrange(tchr1, desc(Position))
+dtchr2 <- arrange(tchr2, desc(Position))
+dtchr3 <- arrange(tchr3, desc(Position))
+dtchr4 <- arrange(tchr4, desc(Position))
+dtchr5 <- arrange(tchr5, desc(Position))
+dtchr6 <- arrange(tchr6, desc(Position))
+dtchr7 <- arrange(tchr7, desc(Position))
+dtchr8 <- arrange(tchr8, desc(Position))
+dtchr9 <- arrange(tchr9, desc(Position))
+dtchr10 <- arrange(tchr10, desc(Position))
+
+dmchr1[dmchr1 == "?/?"] <- "-/-"
+dmchr2[dmchr2 == "?/?"] <- "-/-"
+dmchr3[dmchr3 == "?/?"] <- "-/-"
+dmchr4[dmchr4 == "?/?"] <- "-/-"
+dmchr5[dmchr5 == "?/?"] <- "-/-"
+dmchr6[dmchr6 == "?/?"] <- "-/-"
+dmchr7[dmchr7 == "?/?"] <- "-/-"
+dmchr8[dmchr8 == "?/?"] <- "-/-"
+dmchr9[dmchr9 == "?/?"] <- "-/-"
+dmchr10[dmchr10 == "?/?"] <- "-/-"
+
+dtchr1[dtchr1 == "?/?"] <- "-/-"
+dtchr2[dtchr2 == "?/?"] <- "-/-"
+dtchr3[dtchr3 == "?/?"] <- "-/-"
+dtchr4[dtchr4 == "?/?"] <- "-/-"
+dtchr5[dtchr5 == "?/?"] <- "-/-"
+dtchr6[dtchr6 == "?/?"] <- "-/-"
+dtchr7[dtchr7 == "?/?"] <- "-/-"
+dtchr8[dtchr8 == "?/?"] <- "-/-"
+dtchr9[dtchr9 == "?/?"] <- "-/-"
+dtchr10[dtchr10 == "?/?"] <- "-/-"
+
+#final environment cleanse
+rm(mchr1) 
+rm(mchr2) 
+rm(mchr3)
+rm(mchr4) 
+rm(mchr5) 
+rm(mchr6) 
+rm(mchr7) 
+rm(mchr8) 
+rm(mchr9) 
+rm(mchr10) 
+rm(tchr1) 
+rm(tchr2) 
+rm(tchr3) 
+rm(tchr4) 
+rm(tchr5) 
+rm(tchr6) 
+rm(tchr7)
+rm(tchr8) 
+rm(tchr9) 
+rm(tchr10)
+
+#commented out below for graphs; remove comment status to run this code
+#rm(fang_gen)
+#rm(snp_pos)
+#rm(fm)
+#rm(ft)
+
+#end of environment cleanse
+
+
+```
+
+```{r}
+##For creating files
+
+
+#write.table(imchr1, file="imchr1.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr2, file="imchr2.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr3, file="imchr3.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr4, file="imchr4.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr5, file="imchr5.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr6, file="imchr6.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr7, file="imchr7.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr8, file="imchr8.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr9, file="imchr9.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(imchr10, file="imchr10.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+
+#write.table(itchr1, file="itchr1.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr2, file="itchr2.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr3, file="itchr3.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr4, file="itchr4.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr5, file="itchr5.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr6, file="itchr6.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr7, file="itchr7.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr8, file="itchr8.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr9, file="itchr9.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(itchr10, file="itchr10.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+
+#write.table(dmchr1, file="dmchr1.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dmchr2, file="dmchr2.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dmchr3, file="dmchr3.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dmchr4, file="dmchr4.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dmchr5, file="dmchr5.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dmchr6, file="dmchr6.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dmchr7, file="dmchr7.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dmchr8, file="dmchr8.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dmchr9, file="dmchr9.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dmchr10, file="dmchr10.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+
+#write.table(dtchr1, file="dtchr1.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dtchr2, file="dtchr2.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dtchr3, file="dtchr3.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dtchr4, file="dtchr4.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dtchr5, file="dtchr5.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dtchr6, file="dtchr6.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dtchr7, file="dtchr7.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dtchr8, file="dtchr8.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dtchr9, file="dtchr9.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+#write.table(dtchr10, file="dtchr10.txt", quote=FALSE, sep = "\t", row.names=FALSE, col.names= TRUE)
+
+##End of file creation
+```
+
+All 40 files are now created. 
+
+Naming scheme is as follows: i or d for increasing or decreasing, m or t for maize or teosinte, and chr# for chromosome numbers 1-10.
+
+
+
+
+
+# Part 2: Data Visualization
+
+A: SNP Density on and across chromosomes, and SNP number in maize vs teosinte.
+
+```{r, echo = FALSE}
+##SNP on and across chromosomes, pregraph work
+
+fm <- arrange(fm, Chromosome)
+ft <- arrange(ft, Chromosome)
+
+fm[fm == "unknown"] <- "0"
+fm[fm == "multiple"] <- "0"
+fm[fm == is.na(fm)] <- "0"
+
+ft[ft == "unknown"] <- "0"
+ft[ft == "multiple"] <- "0"
+ft[ft == is.na(ft)] <- "0"
+
+fm[,3] <- sapply(fm[,3], as.numeric)
+ft[,3] <- sapply(ft[,3], as.numeric)
+
+gm <- filter(fm, Position != "0") 
+gm[,2] <- sapply(gm[,2], as.numeric)
+gm <- arrange(gm, Chromosome)
+
+gt <- filter(ft, Position != "0")
+gt[,2] <- sapply(gt[,2], as.numeric)
+gt <- arrange(gm, Chromosome)
+```
+
+```{r, echo = FALSE}
+#Graph for maize
+gm <- gm %>% group_by(Chromosome) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+
+ggplot(gm) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Maize") + ylab("SNP Density") 
+```
+
+```{r,echo=FALSE}
+#Graph for teosinte
+gt <- gt %>% group_by(Chromosome) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+
+ggplot(gt) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Teosinte") + ylab("SNP Density")
+```
+
+```{r, echo = FALSE}
+##SNP between maize and teosinte
+
+gm <- gm %>% mutate(Category = "Maize", .before=Chromosome)
+
+gt <- gt %>% mutate(Category = "Teosinte", .before=Chromosome)
+
+jgmt <- full_join(gm, gt)
+
+ggplot(jgmt) + geom_bar(mapping = aes(x=Category, fill=Category)) + facet_wrap(~ Chromosome) + ylab("Count of SNPS") + xlab("Category")
+
+```
+
+```{r, echo = FALSE}
+ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned, fill=Category)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned)) + xlab("Area of Chromosome") + ylab("SNP Density Across All Chromosomes")
+```
+
+B: Missing data and amount of heterozygosity.
+
+```{r, echo = FALSE}
+#Potentially useful code??
+#library(data.table)
+
+#unite_fang <- fang_gen %>% unite(X1, X1, X3, sep="_")
+
+#filter(unite_fang, X1 %like% "Sample_ID_Group" | X1 %like% 'ZMMIL' | X1 %like% 'ZMMLR' | X1 %like% 'ZMMMR' | X1 %like% 'ZMPBA' | X1 %like% 'ZMPIL' | X1 %like% 'ZMPJA')
+
+##Copy of below code from part 3 Sample Size Graph
+#mwitht <- filter(fang_gen, X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR" | X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA")
+
+#maiz <- mwitht %>% filter(X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR") %>% mutate(Category = "Maize", .before=X3)
+
+#maiz[1,3] <- "Category"
+
+#tesi <- mwitht %>% filter(X3 == "Group" |X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA") %>% mutate(Category = "Teosinte", .before=X3)
+ 
+#tesi[1,3] <- "Category"
+
+#rejoined <- full_join(tesi, maiz)
+
+#colnames(rejoined) <- rejoined[1,] 
+#rejoined <- rejoined[-1,]
+#rejoined
+
+##End of copy
+
+##Attempts to get functions to work
+
+#tempo <- function(x) for(i in col(x)){if(i == "A/A"){"0"}else if (i == "G/G"){"0"}else if(i == "C/C"){"0"}else if(i == "T/T"){"0"}else if(i == "?/?"){NA}else{"1"}}
+
+#hetz <- function(x) if(x %in% c("A/A","G/G","C/C","T/T")){"0"} else if(x == "?/?"){NA} else{"1"}
+
+#rejoined %>% select(!"Sample_ID" & !"JG_OTU" & !"Category" & !"Group") %>% lapply(hetz)
+
+#Function test that works?
+#hetz("A/T")
+
+#head(rejoined)
+
+####
+#jgmt %>% mutate(ZDP_0752a_het = ZDP_0752a != "A/A " & ZDP_0752a != "G/G" & ZDP_0752a != "T/T" & ZDP_0752a != "C/C", .before=ZDP_0752a)
+##Above code works to separate heterozygotes/missing data and homozygotes for specific column
+##Now to get it to be automated for all columns........
+
+#hz <- function(x) mutate(het_x = x != "A/A " & x != "G/G" & x != "T/T" & x != "C/C")
+
+#hetz <- function(x) if(x != "A/A" & x != "G/G" & x != "T/T" & x != "C/C"){TRUE}
+
+#temporary <- jgmt %>% select(!SNP_ID & !Chromosome & !Group & !Position)
+
+#additional <- jgmt %>% select(SNP_ID, Chromosome, Group, Position)
+
+#temporary %>% cols %>% hz
+
+#jgmt %>% mutate(het_x = x != "A/A " & x != "G/G" & x != "T/T" & x != "C/C")
+
+##new idea
+#make function for going through columns
+
+#column <- function(x) select(x, col)
+
+#jgmt %>% mutate(het = column != "A/A " & column != "G/G" & column != "T/T" & column != "C/C")
+
+## :(  why wont anything work sigh, its 12:30 AM
+
+#jgmt %>% select(!SNP_ID & !Chromosome & !Group & !Position) %>% mutate(.col != "A/A " & {.col} != "G/G" & {.col} != "T/T" & {.col} != "C/C")
+
+#temporary %>% mutate(het_{colnames} = {colnames} != "A/A" & {colnames} != "G/G" & {colnames} != "T/T" & {colnames} != "C/C")
+
+#temporary %>% mutate(across(.cols = everything(), .fns= , .names = "het_{.col}"))
+
+#temporary %>% mutate(across(.cols = everything(), .fns=NULL, .names = "het_{.col}"))
+
+#ggplot(jgmt) + geom_point(mapping = aes(x=Group, y=SNP_ID))
+
+#End of attempts
+```
+
+C: Maize SNPS and the Centromere.
+
+https://www.researchgate.net/figure/Genetic-and-physical-map-locations-of-all-10-maize-centromeres_fig5_40443825
+Used "Estimated Physical Map Position Based on Genetic Markers" column for centromere position on each chromosome
+
+
+```{r, echo = FALSE}
+
+
+## 
+cmchr1 <- imchr1 %>% mutate(Centromere = Position >= 121000000 & Position <= 133100000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+cmchr2 <- imchr2 %>% mutate(Centromere = Position >= 92200000 & Position <= 101600000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+cmchr3 <- imchr3 %>% mutate(Centromere = Position >= 87400000 & Position <= 89400000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+cmchr4 <- imchr4 %>% mutate(Centromere = Position >= 71800000 & Position <= 93000000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+cmchr5 <- imchr5 %>% mutate(Centromere = Position >= 94800000 & Position <= 118400000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+cmchr6 <- imchr6 %>% mutate(Centromere = Position >= 31800000 & Position <= 32700000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+cmchr7 <- imchr7 %>% mutate(Centromere = Position >= 44900000 & Position <= 54100000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+cmchr8 <- imchr8 %>% mutate(Centromere = Position >= 55800000 & Position <= 80700000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+cmchr9 <- imchr9 %>% mutate(Centromere = Position >= 34100000 & Position <= 34200000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+cmchr10 <- imchr10 %>% mutate(Centromere = Position >= 37100000 & Position <= 46000000, .before=Position) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
+
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr1) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 1") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr2) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 2") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr3) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 3") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr4) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 4") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr5) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 5") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr6) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 6") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr7) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 7") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr8) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 8") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr9) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 9") + ylab("SNP Density")
+```
+
+```{r, echo=FALSE}
+ggplot(cmchr10) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 10") + ylab("SNP Density")
+```
+
+```{r, echo = FALSE}
+
+mwitht <- filter(fang_gen, X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR" | X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA")
+
+maiz <- mwitht %>% filter(X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR") %>% mutate(Category = "Maize", .before=X3)
+
+maiz[1,3] <- "Category"
+
+tesi <- mwitht %>% filter(X3 == "Group" |X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA") %>% mutate(Category = "Teosinte", .before=X3)
+ 
+tesi[1,3] <- "Category"
+
+rejoined <- full_join(tesi, maiz)
+
+colnames(rejoined) <- rejoined[1,] 
+rejoined <- rejoined[-1,]
+
+ggplot(rejoined) + geom_bar(mapping = aes(x=Category, fill=Group)) + xlab("Category") + ylab("Count of Samples")
+
+```
+```{r, echo=FALSE}
+ggplot(rejoined) + geom_bar(mapping = aes(x = abph1.20, fill = Category)) + xlab("SNP abph1.20 Variations") + ylab("Frequency")
+```
+
+```{r, echo=FALSE}
+ggplot(rejoined) + geom_bar(mapping = aes(x=abph1.20, fill=Group)) + xlab("SNP abph1.20 Variations") + ylab("Frequency")
+```
+
+
+# The END

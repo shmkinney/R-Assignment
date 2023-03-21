@@ -412,6 +412,9 @@ ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned)) + xlab("Area of Chromo
 B: Missing data and amount of heterozygosity.
 
 ```{r, echo = FALSE}
+
+
+
 #Potentially useful code??
 #library(data.table)
 
@@ -420,23 +423,33 @@ B: Missing data and amount of heterozygosity.
 #filter(unite_fang, X1 %like% "Sample_ID_Group" | X1 %like% 'ZMMIL' | X1 %like% 'ZMMLR' | X1 %like% 'ZMMMR' | X1 %like% 'ZMPBA' | X1 %like% 'ZMPIL' | X1 %like% 'ZMPJA')
 
 ##Copy of below code from part 3 Sample Size Graph
-#mwitht <- filter(fang_gen, X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR" | X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA")
+mwitht <- filter(fang_gen, X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR" | X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA")
 
-#maiz <- mwitht %>% filter(X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR") %>% mutate(Category = "Maize", .before=X3)
+maiz <- mwitht %>% filter(X3 == "Group" | X3 == "ZMMIL" | X3 == "ZMMLR" | X3 == "ZMMMR") %>% mutate(Category = "Maize", .before=X3)
 
-#maiz[1,3] <- "Category"
+maiz[1,3] <- "Category"
 
-#tesi <- mwitht %>% filter(X3 == "Group" |X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA") %>% mutate(Category = "Teosinte", .before=X3)
+tesi <- mwitht %>% filter(X3 == "Group" |X3 == "ZMPBA" | X3 == "ZMPIL" | X3 == "ZMPJA") %>% mutate(Category = "Teosinte", .before=X3)
  
-#tesi[1,3] <- "Category"
+tesi[1,3] <- "Category"
 
-#rejoined <- full_join(tesi, maiz)
+rejoined <- full_join(tesi, maiz)
 
-#colnames(rejoined) <- rejoined[1,] 
-#rejoined <- rejoined[-1,]
-#rejoined
+colnames(rejoined) <- rejoined[1,] 
+rejoined <- rejoined[-1,]
+rejoined
 
 ##End of copy
+
+Homozygous <- rowSums(rejoined == "A/A" | rejoined == "C/C" | rejoined == "G/G" | rejoined == "T/T")
+Heterozygous <- rowSums(rejoined == "C/G" | rejoined == "A/C" | rejoined == "G/T" | rejoined == "A/G"| rejoined == "C/T" | rejoined == "A/T")
+MissingData <- rowSums(rejoined == "?/?")
+Category <- select(rejoined, "Category")
+Group <- select(rejoined, "Group")
+Sample_ID <- select(rejoined, "Sample_ID")
+
+HetFull <- data.frame(Sample_ID, Group, Category, Homozygous, Heterozygous, MissingData)
+head(HetFull)
 
 ##Attempts to get functions to work
 

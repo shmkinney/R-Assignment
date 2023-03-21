@@ -372,42 +372,44 @@ gm <- arrange(gm, Chromosome)
 gt <- filter(ft, Position != "0")
 gt[,2] <- sapply(gt[,2], as.numeric)
 gt <- arrange(gm, Chromosome)
-```
 
-```{r, echo = FALSE}
-#Graph for maize
 gm <- gm %>% group_by(Chromosome) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
 
-ggplot(gm) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Maize") + ylab("SNP Density") 
-```
-
-```{r,echo=FALSE}
-#Graph for teosinte
 gt <- gt %>% group_by(Chromosome) %>% mutate(Position.Binned = cut(Position, 25, labels=FALSE))
-
-ggplot(gt) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Teosinte") + ylab("SNP Density")
-```
-
-```{r, echo = FALSE}
-##SNP between maize and teosinte
 
 gm <- gm %>% mutate(Category = "Maize", .before=Chromosome)
 
 gt <- gt %>% mutate(Category = "Teosinte", .before=Chromosome)
 
 jgmt <- full_join(gm, gt)
-
-ggplot(jgmt) + geom_bar(mapping = aes(x=Category, fill=Category)) + facet_wrap(~ Chromosome) + ylab("Count of SNPS") + xlab("Category")
-
 ```
 
 ```{r, echo = FALSE}
+#Graph for maize
+
+ggplot(gm) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Maize") + ylab("SNP Density") 
+
+#Graph for teosinte
+
+ggplot(gt) + geom_bar(mapping = aes(x=Position.Binned)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome in Teosinte") + ylab("SNP Density")
+
+##SNP between maize and teosinte
+
+ggplot(jgmt) + geom_bar(mapping = aes(x=Category, fill=Category)) + facet_wrap(~ Chromosome) + ylab("Count of SNPS") + xlab("Category")
+
+#Added SNPs of Maize and Teosinte per Chromosome
 ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned, fill=Category)) + facet_wrap(~ Chromosome) + xlab("Area of Chromosome") + ylab("SNP Density")
+
+
+#Density of SNPs over all Chromosomes
+ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned)) + xlab("Area of Chromosome") + ylab("SNP Density Across All Chromosomes")
+
+#Chromosome Map
+ggplot(gm) + geom_point(mapping= aes(x=factor(Chromosome, levels=c(1:10)), y=Position),  shape = 3) + xlab("Maize Chromosome") + ylab("Position on Chromsome")
+
+ggplot(gt) + geom_point(mapping= aes(x=factor(Chromosome, levels=c(1:10)), y=Position),  shape = 3) + xlab("Teosinte Chromosome") + ylab("Position on Chromsome")
 ```
 
-```{r, echo=FALSE}
-ggplot(jgmt) + geom_bar(mapping = aes(x=Position.Binned)) + xlab("Area of Chromosome") + ylab("SNP Density Across All Chromosomes")
-```
 
 B: Missing data and amount of heterozygosity.
 
@@ -436,124 +438,87 @@ Sample_ID <- select(rejoined, "Sample_ID")
 
 HetFull <- data.frame(Sample_ID, Group, Category, Homozygous, Heterozygous, MissingData)
 head(HetFull)
+```
 
+```{r, echo = FALSE}
+#Homozygous graphs
 ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Homozygous)) + xlab("Sample") + ylab("Number of Homozygous SNPs")
 
-```
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Homozygous, color=Group)) + xlab("Sample") + ylab("Number of Homozygous SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Homozygous, color=Category)) + xlab("Sample") + ylab("Number of Homozygous SNPs")
-```
 
-
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Homozygous, color=Group)) + xlab("Sample Group") + ylab("Number of Homozygous SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Homozygous, color=Category)) + xlab("Sample Group") + ylab("Number of Homozygous SNPs")
-```
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_bar(mapping = aes(x=Homozygous, fill=Group))
-```
 
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_bar(mapping = aes(x=Homozygous, fill=Group), position = "fill")
-```
+ggplot(HetFull) + geom_bar(mapping = aes(x=Homozygous, fill=Group)) + xlab("Number of Homozygous SNPs") + ylab("Number of Occurences")
 
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_density(mapping = aes(x=Homozygous, fill=Group), alpha=0.4)
-```
+ggplot(HetFull) + geom_bar(mapping = aes(x=Homozygous, fill=Group), position = "fill") + xlab("Number of Homozygous SNPs") + ylab("Percentage")
 
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_density(mapping = aes(x=Homozygous, fill=Category), alpha=0.4)
+ggplot(HetFull) + geom_bar(mapping = aes(x=Homozygous, fill=Category)) + xlab("Number of Homozygous SNPs") + ylab("Number of Occurences")
+
+ggplot(HetFull) + geom_bar(mapping = aes(x=Homozygous, fill=Category), position = "fill") + xlab("Number of Homozygous SNPs") + ylab("Percentage")
+
+ggplot(HetFull) + geom_density(mapping = aes(x=Homozygous, fill=Group), alpha=0.4) + xlab("Homozygous SNPs") + ylab("Density")
+
+ggplot(HetFull) + geom_density(mapping = aes(x=Homozygous, fill=Category), alpha=0.4) + xlab("Homozygous SNPs") + ylab("Density")
 ```
 
-
 ```{r, echo = FALSE}
+#heterozygous graphs
 ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Heterozygous)) + xlab("Sample") + ylab("Number of Heterozygous SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Heterozygous, color=Group)) + xlab("Sample") + ylab("Number of Heterozygous SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Heterozygous, color=Category)) + xlab("Sample") + ylab("Number of Heterozygous SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Heterozygous, color=Group)) + xlab("Sample Group") + ylab("Number of Heterozygous SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Heterozygous, color=Category)) + xlab("Sample Group") + ylab("Number of Heterozygous SNPs")
+
+ggplot(HetFull) + geom_bar(mapping = aes(x=Heterozygous, fill=Group)) + xlab("Number of Heterozygous SNPs") + ylab("Number of Occurences")
+
+ggplot(HetFull) + geom_bar(mapping = aes(x=Heterozygous, fill=Group),position = "fill") + xlab("Number of Heterozygous SNPs") + ylab("Percentage")
+
+ggplot(HetFull) + geom_bar(mapping = aes(x=Heterozygous, fill=Category)) + xlab("Number of Heterozygous SNPs") + ylab("Number of Occurences")
+
+ggplot(HetFull) + geom_bar(mapping = aes(x=Heterozygous, fill=Category), position = "fill") + xlab("Number of Heterozygous SNPs") + ylab("Percentage")
+
+ggplot(HetFull) + geom_density(mapping = aes(x=Heterozygous, fill=Group), alpha=0.4) + xlab("Number of Heterozygous SNPs") + ylab("Density")
+
+ggplot(HetFull) + geom_density(mapping = aes(x=Heterozygous, fill=Category), alpha=0.4) + xlab("Number of Heterozygous SNPs") + ylab("Density")
+
+
 ```
 
 ```{r, echo = FALSE}
-ggplot(HetFull) + geom_bar(mapping = aes(x=Heterozygous, fill=Group))
-```
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_bar(mapping = aes(x=Heterozygous, fill=Group),position = "fill")
-```
-
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_density(mapping = aes(x=Heterozygous, fill=Group), alpha=0.4)
-```
-
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_density(mapping = aes(x=Heterozygous, fill=Category), alpha=0.4)
-```
-
-
-```{r, echo = FALSE}
+#missing data graphs
 ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=MissingData)) + xlab("Sample") + ylab("Number of Missing Data SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=MissingData, color=Group)) + xlab("Sample") + ylab("Number of Missing Data SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=MissingData, color=Category)) + xlab("Sample") + ylab("Number of Missing Data SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=MissingData, color=Group)) + xlab("Sample Group") + ylab("Number of Missing Data SNPs")
-```
 
-```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=MissingData, color=Category)) + xlab("Sample Group") + ylab("Number of Missing Data SNPs")
+
+ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Group)) + xlab("Number of Missing Data SNPs") + ylab("Number of Occurences")
+
+ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Group), position = "fill") + xlab("Number of Missing Data SNPs") + ylab("Percentage")
+
+ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Category)) + xlab("Number of Missing Data SNPs") + ylab("Number of Occurences")
+
+ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Category), position = "fill") + xlab("Number of Missing Data SNPs") + ylab("Percentage")
+
+ggplot(HetFull) + geom_density(mapping = aes(x=MissingData, fill=Group), alpha=0.4) + xlab("Number of Missing Data SNPs") + ylab("Density")
+
+ggplot(HetFull) + geom_density(mapping = aes(x=MissingData, fill=Category), alpha=0.4) + xlab("Number of Missing Data SNPs") + ylab("Density")
 ```
 
 ```{r, echo = FALSE}
-ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Group))
-```
-
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Group), position = "fill")
-```
-
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Category))
-```
-
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Category), position = "fill")
-```
-
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_density(mapping = aes(x=MissingData, fill=Group), alpha=0.4)
-```
-
-```{r, echo = FALSE}
-ggplot(HetFull) + geom_density(mapping = aes(x=MissingData, fill=Category), alpha=0.4)
-```
-
-```{r, echo = FALSE}
+#graphs of total heterozygous, homozygous, missing data snps
 head(rejoined)
 
 newmt <- rejoined
@@ -570,11 +535,11 @@ newmt <- newmt %>% pivot_longer(cols = -c("Sample_ID", "Category", "Group"),
 
 head(newmt)
 
-ggplot(newmt) + geom_bar(mapping = aes(x=Group, fill = snp_data), position = "fill")
+ggplot(newmt) + geom_bar(mapping = aes(x=Group, fill = snp_data), position = "fill") + xlab("Group") + ylab("Percentage")
 
-ggplot(newmt) + geom_bar(mapping= aes(x=Category, fill = snp_data), position = "fill")
+ggplot(newmt) + geom_bar(mapping= aes(x=Category, fill = snp_data), position = "fill") + xlab("Category") + ylab("Percentage")
 
-ggplot(newmt) + geom_bar(mapping = aes(x=Sample_ID, fill = snp_data), position = "fill")
+ggplot(newmt) + geom_bar(mapping = aes(x=Sample_ID, fill = snp_data), position = "fill") + xlab("Sample") + ylab("Percentage")
 
 ```
 
@@ -605,55 +570,49 @@ cmchr10 <- imchr10 %>% mutate(Centromere = Position >= 37100000 & Position <= 46
 ```
 
 ```{r, echo=FALSE}
+#maize chromosomes and centromere graphs
 ggplot(cmchr1) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 1") + ylab("SNP Density")
-```
 
-```{r, echo=FALSE}
 ggplot(cmchr2) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 2") + ylab("SNP Density")
-```
 
-```{r, echo=FALSE}
 ggplot(cmchr3) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 3") + ylab("SNP Density")
-```
 
-```{r, echo=FALSE}
 ggplot(cmchr4) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 4") + ylab("SNP Density")
-```
 
-```{r, echo=FALSE}
 ggplot(cmchr5) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 5") + ylab("SNP Density")
-```
 
-```{r, echo=FALSE}
 ggplot(cmchr6) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 6") + ylab("SNP Density")
-```
 
-```{r, echo=FALSE}
 ggplot(cmchr7) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 7") + ylab("SNP Density")
-```
 
-```{r, echo=FALSE}
 ggplot(cmchr8) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 8") + ylab("SNP Density")
-```
 
-```{r, echo=FALSE}
 ggplot(cmchr9) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 9") + ylab("SNP Density")
-```
 
-```{r, echo=FALSE}
 ggplot(cmchr10) + geom_bar(mapping = aes(x=Position.Binned, fill=Centromere)) + xlab("Area on Chromosome 10") + ylab("SNP Density")
+
+ggplot(cmchr1) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
+ggplot(cmchr2) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
+ggplot(cmchr3) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
+ggplot(cmchr4) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
+ggplot(cmchr5) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
+ggplot(cmchr6) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
+ggplot(cmchr7) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
+ggplot(cmchr8) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
+ggplot(cmchr9) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
+ggplot(cmchr10) + geom_point(mapping = aes(x=Chromosome, y = Position, color = Centromere)) +xlab("Chromosome") + ylab("Position on Chromosome")
 ```
 
 ```{r, echo = FALSE}
-
+#Number of Samples for Maize and Teosinte
 ggplot(rejoined) + geom_bar(mapping = aes(x=Category, fill=Group)) + xlab("Category") + ylab("Count of Samples")
 
 ```
-```{r, echo=FALSE}
-ggplot(rejoined) + geom_bar(mapping = aes(x = abph1.20, fill = Category)) + xlab("SNP abph1.20 Variations") + ylab("Frequency")
-```
 
 ```{r, echo=FALSE}
+#Graph of SNP variations for snp abph1.20
+ggplot(rejoined) + geom_bar(mapping = aes(x = abph1.20, fill = Category)) + xlab("SNP abph1.20 Variations") + ylab("Frequency")
+
 ggplot(rejoined) + geom_bar(mapping = aes(x=abph1.20, fill=Group)) + xlab("SNP abph1.20 Variations") + ylab("Frequency")
 ```
 

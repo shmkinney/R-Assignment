@@ -456,6 +456,127 @@ ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Homozygous, color=Group)) 
 ```{r, echo = FALSE}
 ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Homozygous, color=Category)) + xlab("Sample Group") + ylab("Number of Homozygous SNPs")
 ```
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_bar(mapping = aes(x=Homozygous, fill=Group))
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_bar(mapping = aes(x=Homozygous, fill=Group), position = "fill")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_density(mapping = aes(x=Homozygous, fill=Group), alpha=0.4)
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_density(mapping = aes(x=Homozygous, fill=Category), alpha=0.4)
+```
+
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Heterozygous)) + xlab("Sample") + ylab("Number of Heterozygous SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Heterozygous, color=Group)) + xlab("Sample") + ylab("Number of Heterozygous SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=Heterozygous, color=Category)) + xlab("Sample") + ylab("Number of Heterozygous SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Heterozygous, color=Group)) + xlab("Sample Group") + ylab("Number of Heterozygous SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=Heterozygous, color=Category)) + xlab("Sample Group") + ylab("Number of Heterozygous SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_bar(mapping = aes(x=Heterozygous, fill=Group))
+```
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_bar(mapping = aes(x=Heterozygous, fill=Group),position = "fill")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_density(mapping = aes(x=Heterozygous, fill=Group), alpha=0.4)
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_density(mapping = aes(x=Heterozygous, fill=Category), alpha=0.4)
+```
+
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=MissingData)) + xlab("Sample") + ylab("Number of Missing Data SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=MissingData, color=Group)) + xlab("Sample") + ylab("Number of Missing Data SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Sample_ID, y=MissingData, color=Category)) + xlab("Sample") + ylab("Number of Missing Data SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=MissingData, color=Group)) + xlab("Sample Group") + ylab("Number of Missing Data SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_point(mapping = aes(x=Group, y=MissingData, color=Category)) + xlab("Sample Group") + ylab("Number of Missing Data SNPs")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Group))
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Group), position = "fill")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Category))
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_bar(mapping = aes(x=MissingData, fill=Category), position = "fill")
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_density(mapping = aes(x=MissingData, fill=Group), alpha=0.4)
+```
+
+```{r, echo = FALSE}
+ggplot(HetFull) + geom_density(mapping = aes(x=MissingData, fill=Category), alpha=0.4)
+```
+
+```{r, echo = FALSE}
+head(rejoined)
+
+newmt <- rejoined
+
+newmt <- newmt[-2]
+
+newmt[newmt == "?/?"] <- "miss"
+newmt[newmt == "A/A" | newmt == "T/T" | newmt == "C/C" | newmt == "G/G"] <- "homo"
+newmt[newmt == "C/G" | newmt == "A/C" | newmt ==  "G/T" | newmt == "A/G" | newmt == "C/T" | newmt == "A/T"] <- "hetero"
+
+newmt <- newmt %>% pivot_longer(cols = -c("Sample_ID", "Category", "Group"),
+                                names_to = "SNP_ID",
+                                values_to = "snp_data")
+
+head(newmt)
+
+ggplot(newmt) + geom_bar(mapping = aes(x=Group, fill = snp_data), position = "fill")
+
+ggplot(newmt) + geom_bar(mapping= aes(x=Category, fill = snp_data), position = "fill")
+
+ggplot(newmt) + geom_bar(mapping = aes(x=Sample_ID, fill = snp_data), position = "fill")
+
+```
 
 
 

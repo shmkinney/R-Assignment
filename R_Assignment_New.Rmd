@@ -382,6 +382,7 @@ gm <- gm %>% mutate(Category = "Maize", .before=Chromosome)
 gt <- gt %>% mutate(Category = "Teosinte", .before=Chromosome)
 
 jgmt <- full_join(gm, gt)
+head(jgmt)
 ```
 
 ```{r, echo = FALSE}

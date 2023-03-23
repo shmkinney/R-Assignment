@@ -547,8 +547,9 @@ ggplot(newmt) + geom_bar(mapping = aes(x=Sample_ID, fill = snp_data), position =
 
 
 
-C: Maize SNPS and the Centromere.
+C: Other Graphs of Choice.
 
+Maize SNPS and the Centromere
 https://www.researchgate.net/figure/Genetic-and-physical-map-locations-of-all-10-maize-centromeres_fig5_40443825
 Used "Estimated Physical Map Position Based on Genetic Markers" column for centromere position on each chromosome
 
